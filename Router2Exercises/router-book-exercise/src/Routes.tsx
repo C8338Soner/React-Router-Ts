@@ -4,6 +4,7 @@ import { ProductsPage } from "./pages/ProductsPage";
 import App from "./App";
 import { ProductPage } from "./pages/Product";
 import { ErrorPage } from "./pages/ErrorPage";
+import { HomePage } from "./pages/Homepage";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
       {
         path: "products",
         element: <ProductsPage />,
