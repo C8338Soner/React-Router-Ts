@@ -1,9 +1,28 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useSearchParams, useNavigate, Form } from "react-router-dom";
 import logo from "./logo.svg";
+import { FormEvent } from "react";
 
 export function Header() {
+  const [searchParams] = useSearchParams(); 
+  function handleSearchSubmit(e:FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const search = formData.get("search") as string;
+    //setSearchParams(search);
+    navigate(`/products/?search=${search}`);
+  }
+  const navigate = useNavigate();
   return (
     <header className="text-center text-slate-50 bg-slate-900 h-40 p5">
+      <Form action="products" className="relative text-right" onSubmit={handleSearchSubmit}>
+        <input
+          type="search"
+          name="search"
+          placeholder="Search"
+          defaultValue={searchParams.get("search") ?? ""}
+          className="absolute right-0 top-0 rounded py-2 px-3 text-gray-700"
+        />
+      </Form>
       <Link to="">
         <img src={logo} alt="Logo" className="inline-block h-20" />
       </Link>
