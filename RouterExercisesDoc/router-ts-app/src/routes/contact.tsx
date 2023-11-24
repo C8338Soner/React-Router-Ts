@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, useLoaderData } from "react-router-dom";
 import { getContact } from "../data/contacts";
+import type { Contact } from "../data/contacts";
 
 export type ContactType = {
   first: string;
@@ -13,8 +14,18 @@ export type ContactType = {
 export type FavoriteProps = {
   contact: ContactType;
 }
+interface LoaderProps{
+  params:{
+    contactId:string;
+  };
+}
+export async function loader({params}:LoaderProps):Promise<{contact:Contact|null}> {
+  const contact = await getContact(params.contactId);
+  return {contact}
+}
 
 export function Contact() {
+  //const {contact} = useLoaderData();
   const contact: ContactType = {
     first: "Your",
     last: "Name",
