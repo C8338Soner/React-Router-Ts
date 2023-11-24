@@ -1,21 +1,24 @@
-import { Outlet, Link, useLoaderData } from "react-router-dom";
-import { getContacts } from "../data/contacts";
-import type { Contact} from "../data/contacts";
+import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
+import { getContacts, createContact } from "../data/contacts";
+import type { Contact } from "../data/contacts";
 
-
-interface LoaderData{
+interface LoaderData {
   contacts: Contact[];
 }
+export async function action() {
+  const contact = await createContact();
+  return { contact };
+}
 
-export async function loader():Promise<LoaderData> {
+export async function loader(): Promise<LoaderData> {
   const contacts = await getContacts("");
   return { contacts };
 }
 
 export default function Root() {
-  const {contacts} = useLoaderData() as LoaderData;
+  const { contacts } = useLoaderData() as LoaderData;
   console.log("contacts is", contacts);
-  
+
   return (
     <>
       <div id="sidebar">
@@ -32,9 +35,9 @@ export default function Root() {
             <div id="search-spinner" aria-hidden hidden={true} />
             <div className="sr-only" aria-live="polite"></div>
           </form>
-          <form method="post">
+          <Form method="post">
             <button type="submit">New</button>
-          </form>
+          </Form>
         </div>
         <nav>
           {contacts.length ? (
@@ -66,7 +69,7 @@ export default function Root() {
               <Link to={`contacts/1`}>Your Name</Link>
             </li>
             <li>
-              <Link to={`contacts/1`}>Your Name</Link>
+              <Link to={`contacts/2`}>Your Friends</Link>
             </li>
           </ul>
         </nav>
