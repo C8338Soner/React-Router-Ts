@@ -1,15 +1,21 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLoaderData } from "react-router-dom";
 import { getContacts } from "../data/contacts";
 import type { Contact} from "../data/contacts";
-import { Key } from "react";
 
 
-export async function loader() {
+interface LoaderData{
+  contacts: Contact[];
+}
+
+export async function loader():Promise<LoaderData> {
   const contacts = await getContacts("");
   return { contacts };
 }
 
 export default function Root() {
+  const {contacts} = useLoaderData() as LoaderData;
+  console.log("contacts is", contacts);
+  
   return (
     <>
       <div id="sidebar">

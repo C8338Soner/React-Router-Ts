@@ -14,6 +14,8 @@ export type Contact = {
 export async function getContacts(query: string): Promise<Contact[]> {
   await fakeNetwork(`getContacts:${query}`);
   let contacts: Contact[] | null = await localforage.getItem("contacts");
+  
+  
   if (!contacts) contacts = [];
   if (query) {
     contacts = matchSorter(contacts, query, { keys: ["first", "last"] });
