@@ -3,19 +3,22 @@ import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
 
 export type Contact = {
-  favorite: any;
   id: string;
   createdAt: number;
+  avatar?: string;
+  twitter?: string;
   first?: string;
   last?: string;
-  // Add other contact properties as needed
-}
+  email?: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  favorite?: boolean;
+};
 
-export async function getContacts(query: string): Promise<Contact[]> {
+export async function getContacts(query?: string | null) {
   await fakeNetwork(`getContacts:${query}`);
-  let contacts: Contact[] | null = await localforage.getItem("contacts");
-  
-  
+  let contacts = await getAllContacts();
   if (!contacts) contacts = [];
   if (query) {
     contacts = matchSorter(contacts, query, { keys: ["first", "last"] });
@@ -23,44 +26,36 @@ export async function getContacts(query: string): Promise<Contact[]> {
   return contacts.sort(sortBy("last", "createdAt"));
 }
 
-export async function createContact(): Promise<Contact> {
+export async function createContact() {
   await fakeNetwork();
   let id = Math.random().toString(36).substring(2, 9);
-  let contact: Contact = {
-      id, createdAt: Date.now(),
-      favorite: undefined
-  };
-  let contacts = await getContacts("");
+  let contact = { id, createdAt: Date.now() };
+  let contacts = await getContacts();
   contacts.unshift(contact);
   await set(contacts);
   return contact;
 }
 
-export async function getContact(id: string): Promise<Contact | null> {
+export async function getContact(id: string) {
   await fakeNetwork(`contact:${id}`);
-  let contacts: Contact[] | null = await localforage.getItem("contacts");
-  let contact = contacts ? contacts.find((c) => c.id === id) : null;
+  let contacts = await getAllContacts();
+  let contact = contacts.find((contact) => contact.id === id);
   return contact ?? null;
 }
 
-export async function updateContact(
-  id: string,
-  updates: Partial<Contact>
-): Promise<Contact> {
+export async function updateContact(id: string, updates: Partial<Contact>) {
   await fakeNetwork();
-  let contacts: Contact[] | null = await localforage.getItem("contacts");
-  if (!contacts) throw new Error("No contacts found.");
-  let contact = contacts.find((c) => c.id === id);
+  let contacts = await getAllContacts();
+  let contact = contacts.find((contact) => contact.id === id);
   if (!contact) throw new Error(`No contact found for ${id}`);
   Object.assign(contact, updates);
   await set(contacts);
   return contact;
 }
 
-export async function deleteContact(id: string): Promise<boolean> {
-  let contacts: Contact[] | null = await localforage.getItem("contacts");
-  if (!contacts) return false;
-  let index = contacts.findIndex((c) => c.id === id);
+export async function deleteContact(id: string) {
+  let contacts = await getAllContacts();
+  let index = contacts.findIndex((contact) => contact.id === id);
   if (index > -1) {
     contacts.splice(index, 1);
     await set(contacts);
@@ -69,27 +64,29 @@ export async function deleteContact(id: string): Promise<boolean> {
   return false;
 }
 
-async function set(contacts: Contact[]): Promise<void> {
-  await localforage.setItem("contacts", contacts);
+async function getAllContacts() {
+  return ((await localforage.getItem("contacts")) ?? []) as Array<Contact>;
 }
 
-// Fake a cache so we don't slow down stuff we've already seen
-let fakeCache: { [key: string]: boolean } = {};
+function set(contacts: Array<Contact>) {
+  return localforage.setItem("contacts", contacts);
+}
 
-async function fakeNetwork(key?: string): Promise<void> {
+// fake a cache so we don't slow down stuff we've already seen
+let fakeCache: Record<string, boolean> = {};
+
+const SLOW_NETWORK = 0;
+async function fakeNetwork(key = "") {
   if (!key) {
     fakeCache = {};
   }
 
-  if (key && fakeCache[key]) {
+  if (fakeCache[key]) {
     return;
   }
 
-  if (key) {
-    fakeCache[key] = true;
-  }
-
+  fakeCache[key] = true;
   return new Promise((res) => {
-    setTimeout(res, Math.random() * 800);
+    setTimeout(res, Math.random() * SLOW_NETWORK);
   });
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form} from "react-router-dom";
 import { getContact } from "../data/contacts";
 import type { Contact } from "../data/contacts";
 
@@ -24,7 +24,7 @@ export async function loader({params}:LoaderProps):Promise<{contact:Contact|null
   return {contact}
 }
 
-export function Contact() {
+export function CardContact() {
   //const {contact} = useLoaderData();
   const contact: ContactType = {
     first: "Your",
