@@ -19,6 +19,12 @@ interface LoaderData {
 export async function loader(args: LoaderFunctionArgs): Promise<LoaderData> {
   const contactId = args.params.contactId || "";
   const contact = await getContact(contactId);
+  if (!contact) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
   console.log("loader func return", contact);
   //console.log("params", params);
 
