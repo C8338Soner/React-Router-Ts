@@ -1,7 +1,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "../pages/ErrorPage";
-import CardContact, { loader as contactLoader } from "./contact";
+import CardContact, { loader as contactLoader , action as contactAction } from "./contact";
 import Root, { loader as rootLoader, action as rootAction } from "./root";
 import EditContact, { action as editAction } from "./edit";
 import { action as destroyAction } from "./destroy";
@@ -23,6 +23,7 @@ const router = createBrowserRouter([
         path: "contacts/:contactId",
         element: <CardContact />,
         loader: contactLoader,
+        action:contactAction,
       },
       {
         path: "contacts/:contactId/edit",

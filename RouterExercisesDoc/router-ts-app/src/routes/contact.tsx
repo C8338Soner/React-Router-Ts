@@ -1,6 +1,6 @@
 import React from "react";
-import { Form, LoaderFunctionArgs, useLoaderData } from "react-router-dom";
-import { getContact } from "../data/contacts";
+import { Form, LoaderFunctionArgs, useLoaderData, useFetcher } from "react-router-dom";
+import { getContact, updateContact } from "../data/contacts";
 import type { ContactType } from "../data/contacts";
 
 export type FavoriteProps = {
@@ -9,12 +9,6 @@ export type FavoriteProps = {
 
 interface LoaderData {
   contact: ContactType | null;
-}
-
-interface LoaderProps {
-  params: {
-    contactId: string;
-  };
 }
 
 export async function loader(args:LoaderFunctionArgs): Promise<LoaderData> {
@@ -33,9 +27,10 @@ export async function loader(args:LoaderFunctionArgs): Promise<LoaderData> {
 
 function Favorite({ contact }: FavoriteProps) {
   let favorite = contact.favorite;
+  const fetcher = useFetcher();
 
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -43,8 +38,14 @@ function Favorite({ contact }: FavoriteProps) {
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
+}
+export async function action({ request, params }:any) {
+  let formData = await request.formData();
+  return updateContact(params.contactId, {
+    favorite: formData.get("favorite") === "true",
+  });
 }
 
 export default function CardContact() {
