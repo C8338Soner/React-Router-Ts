@@ -6,45 +6,71 @@ import {
   redirect,
   NavLink,
   useNavigation,
+  useSubmit,
 } from "react-router-dom";
 import { getContacts, createContact } from "../data/contacts";
 import type { ContactType } from "../data/contacts";
+import { useEffect } from "react";
 
 interface LoaderData {
   contacts: ContactType[];
+  q: string;
 }
+
 export async function action() {
   const contact = await createContact();
   return redirect(`/contacts/${contact.id}/edit`);
   //return { contact };
 }
 
-export async function loader(): Promise<LoaderData> {
-  const contacts = await getContacts("");
-  return { contacts };
+export async function loader({ request }: any) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
+  return { contacts, q };
 }
 
 export default function Root() {
-  const { contacts } = useLoaderData() as LoaderData;
+  const { contacts, q } = useLoaderData() as LoaderData;
   const navigation = useNavigation();
+  const submit = useSubmit();
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has("q");
   console.log("contacts is", contacts);
+  useEffect(() => {
+    const inputElement = document.getElementById(
+      "q"
+    ) as HTMLInputElement | null;
+    if (inputElement && q !== null && q !== undefined) {
+      inputElement.value = q;
+    }
+  }, [q]);
 
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <form id="search-form" role="search">
+          <Form id="search-form" role="search">
             <input
               id="q"
+              className={searching ? "loading" : ""}
               aria-label="Search contacts"
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={q}
+              onChange={(event) => {
+                const isFirstSearch = q == null;
+                submit(event.currentTarget.form, {
+                  replace: !isFirstSearch,
+                });
+              }}
             />
-            <div id="search-spinner" aria-hidden hidden={true} />
+            <div id="search-spinner" aria-hidden hidden={!searching} />
             <div className="sr-only" aria-live="polite"></div>
-          </form>
+          </Form>
           <Form method="post">
             <button type="submit">New</button>
           </Form>
