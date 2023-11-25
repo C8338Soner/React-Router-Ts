@@ -1,27 +1,21 @@
 import React from "react";
-import { Form} from "react-router-dom";
+import { Form } from "react-router-dom";
 import { getContact } from "../data/contacts";
-import type { Contact } from "../data/contacts";
+import type { ContactType } from "../data/contacts";
 
-export type ContactType = {
-  first: string;
-  last: string;
-  avatar: string;
-  twitter: string;
-  notes: string;
-  favorite: boolean;
-}
 export type FavoriteProps = {
   contact: ContactType;
-}
-interface LoaderProps{
-  params:{
-    contactId:string;
+};
+interface LoaderProps {
+  params: {
+    contactId: string;
   };
 }
-export async function loader({params}:LoaderProps):Promise<{contact:Contact|null}> {
+export async function loader({
+  params,
+}: LoaderProps): Promise<{ contact: ContactType | null }> {
   const contact = await getContact(params.contactId);
-  return {contact}
+  return { contact };
 }
 
 export function CardContact() {
@@ -33,6 +27,8 @@ export function CardContact() {
     twitter: "your_handle",
     notes: "Some notes",
     favorite: true,
+    id: "",
+    createdAt: 0,
   };
 
   return (

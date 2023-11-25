@@ -2,7 +2,7 @@ import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
 
-export type Contact = {
+export type ContactType = {
   id: string;
   createdAt: number;
   avatar?: string;
@@ -43,7 +43,7 @@ export async function getContact(id: string) {
   return contact ?? null;
 }
 
-export async function updateContact(id: string, updates: Partial<Contact>) {
+export async function updateContact(id: string, updates: Partial<ContactType>) {
   await fakeNetwork();
   let contacts = await getAllContacts();
   let contact = contacts.find((contact) => contact.id === id);
@@ -65,10 +65,10 @@ export async function deleteContact(id: string) {
 }
 
 async function getAllContacts() {
-  return ((await localforage.getItem("contacts")) ?? []) as Array<Contact>;
+  return ((await localforage.getItem("contacts")) ?? []) as Array<ContactType>;
 }
 
-function set(contacts: Array<Contact>) {
+function set(contacts: Array<ContactType>) {
   return localforage.setItem("contacts", contacts);
 }
 
