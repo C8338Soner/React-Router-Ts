@@ -1,28 +1,53 @@
 import React from "react";
-import { Form, useLoaderData, LoaderFunctionArgs  } from "react-router-dom";
+import { Form, LoaderFunctionArgs, useLoaderData } from "react-router-dom";
 import { getContact } from "../data/contacts";
 import type { ContactType } from "../data/contacts";
 
 export type FavoriteProps = {
   contact: ContactType;
 };
+
 interface LoaderData {
   contact: ContactType | null;
 }
+
 interface LoaderProps {
-  contactId: string;
   params: {
     contactId: string;
   };
 }
-export async function loader(
-  params: LoaderProps
-): Promise<{ contact: ContactType | null }> {
-  const contact = await getContact(params.contactId);
+
+export async function loader(args:LoaderFunctionArgs): Promise<LoaderData> {
+  const contactId = args.params.contactId|| "";
+  const contact = await getContact(contactId);
+  console.log("loader func return", contact);
+  //console.log("params", params);
+
+  if (contact === null) {
+    // Handle the case where contact is null
+    throw new Error("Contact not found");
+  }
+
   return { contact };
 }
 
-export function CardContact() {
+function Favorite({ contact }: FavoriteProps) {
+  let favorite = contact.favorite;
+
+  return (
+    <Form method="post">
+      <button
+        name="favorite"
+        value={favorite ? "false" : "true"}
+        aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        {favorite ? "★" : "☆"}
+      </button>
+    </Form>
+  );
+}
+
+export default function CardContact() {
   const { contact } = useLoaderData() as { contact: ContactType };
 
   return (
@@ -83,20 +108,5 @@ export function CardContact() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Favorite({ contact }: FavoriteProps) {
-  let favorite = contact.favorite;
-  return (
-    <Form method="post">
-      <button
-        name="favorite"
-        value={favorite ? "false" : "true"}
-        aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-      >
-        {favorite ? "★" : "☆"}
-      </button>
-    </Form>
   );
 }
