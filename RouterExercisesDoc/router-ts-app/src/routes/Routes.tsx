@@ -5,6 +5,7 @@ import CardContact, { loader as contactLoader } from "./contact";
 import Root, { loader as rootLoader, action as rootAction } from "./root";
 import EditContact, { action as editAction } from "./edit";
 import { action as destroyAction } from "./destroy";
+import Index  from "../routes/index";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
     loader: rootLoader,
     action: rootAction,
     children: [
+      {
+        index:true,
+        element:<Index/>,
+      },
       {
         path: "contacts/:contactId",
         element: <CardContact />,
