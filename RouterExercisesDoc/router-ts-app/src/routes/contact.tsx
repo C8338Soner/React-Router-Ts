@@ -1,35 +1,29 @@
 import React from "react";
-import { Form } from "react-router-dom";
+import { Form, useLoaderData, LoaderFunctionArgs  } from "react-router-dom";
 import { getContact } from "../data/contacts";
 import type { ContactType } from "../data/contacts";
 
 export type FavoriteProps = {
   contact: ContactType;
 };
+interface LoaderData {
+  contact: ContactType | null;
+}
 interface LoaderProps {
+  contactId: string;
   params: {
     contactId: string;
   };
 }
-export async function loader({
-  params,
-}: LoaderProps): Promise<{ contact: ContactType | null }> {
+export async function loader(
+  params: LoaderProps
+): Promise<{ contact: ContactType | null }> {
   const contact = await getContact(params.contactId);
   return { contact };
 }
 
 export function CardContact() {
-  //const {contact} = useLoaderData();
-  const contact: ContactType = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://placekitten.com/g/200/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-    id: "",
-    createdAt: 0,
-  };
+  const { contact } = useLoaderData() as { contact: ContactType };
 
   return (
     <div id="contact">

@@ -1,9 +1,9 @@
 import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
 import { getContacts, createContact } from "../data/contacts";
-import type { Contact } from "../data/contacts";
+import type { ContactType } from "../data/contacts";
 
 interface LoaderData {
-  contacts: Contact[];
+  contacts: ContactType[];
 }
 export async function action() {
   const contact = await createContact();
@@ -42,7 +42,7 @@ export default function Root() {
         <nav>
           {contacts.length ? (
             <ul>
-              {contacts.map((contact: Contact) => (
+              {contacts.map((contact: ContactType) => (
                 <li key={contact.id}>
                   <Link to={`contacts/${contact.id}`}>
                     {contact.first || contact.last ? (

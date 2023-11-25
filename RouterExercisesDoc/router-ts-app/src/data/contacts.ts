@@ -14,6 +14,7 @@ export type ContactType = {
   address?: string;
   notes?: string;
   favorite?: boolean;
+  
 };
 
 export async function getContacts(query?: string | null) {
