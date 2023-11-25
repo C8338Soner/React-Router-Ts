@@ -1,5 +1,10 @@
 import React from "react";
-import { Form, LoaderFunctionArgs, useLoaderData, useFetcher } from "react-router-dom";
+import {
+  Form,
+  LoaderFunctionArgs,
+  useLoaderData,
+  useFetcher,
+} from "react-router-dom";
 import { getContact, updateContact } from "../data/contacts";
 import type { ContactType } from "../data/contacts";
 
@@ -11,8 +16,8 @@ interface LoaderData {
   contact: ContactType | null;
 }
 
-export async function loader(args:LoaderFunctionArgs): Promise<LoaderData> {
-  const contactId = args.params.contactId|| "";
+export async function loader(args: LoaderFunctionArgs): Promise<LoaderData> {
+  const contactId = args.params.contactId || "";
   const contact = await getContact(contactId);
   console.log("loader func return", contact);
   //console.log("params", params);
@@ -28,6 +33,9 @@ export async function loader(args:LoaderFunctionArgs): Promise<LoaderData> {
 function Favorite({ contact }: FavoriteProps) {
   let favorite = contact.favorite;
   const fetcher = useFetcher();
+  if (fetcher.formData) {
+    favorite = fetcher.formData.get("favorite") === "true";
+  }
 
   return (
     <fetcher.Form method="post">
@@ -41,7 +49,7 @@ function Favorite({ contact }: FavoriteProps) {
     </fetcher.Form>
   );
 }
-export async function action({ request, params }:any) {
+export async function action({ request, params }: any) {
   let formData = await request.formData();
   return updateContact(params.contactId, {
     favorite: formData.get("favorite") === "true",
